@@ -37,8 +37,9 @@ pip install -r requirements.txt
 3. Variables de entorno (Opcional)
 ```bash
 # WINDOWS
-$env:SERVICIOS="http://127.0.0.1:5000,http://127.0.0.1:5001/"
+$env:SERVICIOS="http://127.0.0.1:5000"
 $env:CHECK_INTERVAL_SEC="1.0"
+$env:FLASK_RUN_PORT=5001 # Puerto diferente al de los servicios
 ```
 
 4. Ejecutar aplicación
@@ -52,6 +53,10 @@ flask run
 - ✅ Respuesta normal:
 ```json
 {
-
+    "Servicios": {
+        "http://127.0.0.1:5000": {
+            "healthy": true
+        }
+    }
 }
 ```

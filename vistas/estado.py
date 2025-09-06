@@ -21,4 +21,4 @@ threading.Thread(target=verificar, daemon=True).start()
 
 class VistaEstado(Resource):
     def get(self):
-        return {"Servicios": SERVICIOS}
+        return {"Servicios": ESTADO}
