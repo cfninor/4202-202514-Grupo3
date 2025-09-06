@@ -10,7 +10,7 @@ class VistaPedido(Resource):
         if CAIDA["value"]:
             time.sleep(3)
             return {"instancia": INSTANCIA, "error": "instancia caida"}, 503
-        time.sleep(LATENCIA/1000.0)
+        time.sleep(int(LATENCIA)/1000.0)
         return {
             "instancia": INSTANCIA,
             "pedidoId": id_pedido,
