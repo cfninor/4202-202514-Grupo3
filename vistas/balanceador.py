@@ -20,13 +20,20 @@ def choose_backend(healthy):
 
 class VistaPedido(Resource):
     def get(self, id_pedido):
-        t0 = time.time()
-        healthy = get_healthy()
-        be = choose_backend(healthy)
+        t0 = time.strftime('%H:%M:%S', time.localtime())
+        try:
+            healthy_list, _snapshot = get_healthy()
+        except Exception as e:
+            last_decisions.append({"t": t0, "target": None, "result": f"hb_error:{type(e).__name__}"})
+            return {"error": "heartbeat error"}, 502
+        print(healthy_list)
+        be = choose_backend(healthy_list)
+        print(be)
         if not be:
             last_decisions.append({"t": t0, "target": None, "result": "no_healthy"})
             return {"error": "no healthy backends"}, 503
         try:
+            print(f"{be}/pedido/{id_pedido}")
             r = requests.get(f"{be}/pedido/{id_pedido}", timeout=TIMEOUT)
             last_decisions.append({"t": t0, "target": be, "result": r.status_code})
             # Propagamos payload y código tal cual
