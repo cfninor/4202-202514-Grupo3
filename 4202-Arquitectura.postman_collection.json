@@ -1,0 +1,577 @@
+{
+	"info": {
+		"_postman_id": "31d8dec8-8aab-4342-bc03-8996cbc4cb5f",
+		"name": "4202-Arquitectura",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "27887927",
+		"_collection_link": "https://pruebas-7679.postman.co/workspace/Pruebas~14d206b8-4aa9-44ff-9e75-93f37f86d361/collection/27887927-31d8dec8-8aab-4342-bc03-8996cbc4cb5f?action=share&source=collection_link&creator=27887927"
+	},
+	"item": [
+		{
+			"name": "Local",
+			"item": [
+				{
+					"name": "Servicio",
+					"item": [
+						{
+							"name": "Estado",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://127.0.0.1:5000/estado?on=false",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "5000",
+									"path": [
+										"estado"
+									],
+									"query": [
+										{
+											"key": "on",
+											"value": "false"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Salud",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://127.0.0.1:5000/salud",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "5000",
+									"path": [
+										"salud"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Pedido",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://127.0.0.1:5000/pedido/1",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "5000",
+									"path": [
+										"pedido",
+										"1"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Monitor",
+					"item": [
+						{
+							"name": "Estado",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://127.0.0.1:5002/estado",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "5002",
+									"path": [
+										"estado"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Start",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "http://127.0.0.1:5002/control/arrancar",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "5002",
+									"path": [
+										"control",
+										"arrancar"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Stop",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "http://127.0.0.1:5002/control/parar",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "5002",
+									"path": [
+										"control",
+										"parar"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Balanceador",
+					"item": [
+						{
+							"name": "Estado",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://127.0.0.1:5003/estado",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "5003",
+									"path": [
+										"estado"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Pedido",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://127.0.0.1:5003/pedido/1",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "5003",
+									"path": [
+										"pedido",
+										"1"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Prueba",
+					"item": [
+						{
+							"name": "Pedido",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+											"",
+											"pm.test(\"Tiempo de respuesta <= 1000 ms\", () => {",
+											"  pm.expect(pm.response.responseTime).to.be.below(1000);",
+											"});",
+											"",
+											"const i = pm.info.iteration;",
+											"",
+											"// Validación extra del balanceador en ciertos puntos",
+											"if (i === 11 || i === 19 || i === 21 || i === 29 || i === 31 || i === 39 || i === 41 || i === 49 || i === 80 || i === 150 || i === 230 || i === 280) {",
+											"  pm.sendRequest('http://127.0.0.1:5003/estado', (err, res) => {",
+											"    pm.expect(err).to.be.null;",
+											"    pm.expect(res.code).to.eql(200);",
+											"  });",
+											"}",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"// Número de iteración en el Runner",
+											"const i = pm.info.iteration;",
+											"",
+											"// Iteración 20: apagar ms-pedidos-1",
+											"if (i === 20) {",
+											"  pm.sendRequest('http://127.0.0.1:5000/estado?on=true', () => {});",
+											"}",
+											"// Iteración 41: encender ms-pedidos-1",
+											"if (i === 41) {",
+											"  pm.sendRequest('http://127.0.0.1:5000/estado?on=false', () => {});",
+											"}",
+											"",
+											"// Iteración 120: apagar ms-pedidos-1",
+											"if (i === 120) {",
+											"  pm.sendRequest('http://127.0.0.1:5000/estado?on=true', () => {});",
+											"}",
+											"// Iteración 180: encender ms-pedidos-1",
+											"if (i === 180) {",
+											"  pm.sendRequest('http://127.0.0.1:5000/estado?on=false', () => {});",
+											"}",
+											"",
+											"// Iteración 210: apagar ms-pedidos-1",
+											"if (i === 210) {",
+											"  pm.sendRequest('http://127.0.0.1:5000/estado?on=true', () => {});",
+											"}",
+											"// Iteración 250: encender ms-pedidos-1",
+											"if (i === 250) {",
+											"  pm.sendRequest('http://127.0.0.1:5000/estado?on=false', () => {});",
+											"}"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://127.0.0.1:5003/pedido/2",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "5003",
+									"path": [
+										"pedido",
+										"2"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Heroku",
+			"item": [
+				{
+					"name": "Servicio",
+					"item": [
+						{
+							"name": "ms-pedidos-1",
+							"item": [
+								{
+									"name": "Estado",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "https://ms-pedidos-963475201021.herokuapp.com/estado?on=false",
+											"protocol": "https",
+											"host": [
+												"ms-pedidos-963475201021",
+												"herokuapp",
+												"com"
+											],
+											"path": [
+												"estado"
+											],
+											"query": [
+												{
+													"key": "on",
+													"value": "false"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Salud",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "https://ms-pedidos-963475201021.herokuapp.com/salud",
+											"protocol": "https",
+											"host": [
+												"ms-pedidos-963475201021",
+												"herokuapp",
+												"com"
+											],
+											"path": [
+												"salud"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Pedido",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "https://ms-pedidos-963475201021.herokuapp.com/pedido/3",
+											"protocol": "https",
+											"host": [
+												"ms-pedidos-963475201021",
+												"herokuapp",
+												"com"
+											],
+											"path": [
+												"pedido",
+												"3"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "ms-pedidos-2",
+							"item": [
+								{
+									"name": "Estado",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "https://ms-pedidos-2-dd9c310b700c.herokuapp.com/estado?on=false",
+											"protocol": "https",
+											"host": [
+												"ms-pedidos-2-dd9c310b700c",
+												"herokuapp",
+												"com"
+											],
+											"path": [
+												"estado"
+											],
+											"query": [
+												{
+													"key": "on",
+													"value": "false"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Salud",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "https://ms-pedidos-2-dd9c310b700c.herokuapp.com/salud",
+											"protocol": "https",
+											"host": [
+												"ms-pedidos-2-dd9c310b700c",
+												"herokuapp",
+												"com"
+											],
+											"path": [
+												"salud"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Pedido",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "https://ms-pedidos-2-dd9c310b700c.herokuapp.com/pedido/1",
+											"protocol": "https",
+											"host": [
+												"ms-pedidos-2-dd9c310b700c",
+												"herokuapp",
+												"com"
+											],
+											"path": [
+												"pedido",
+												"1"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "Monitor",
+					"item": [
+						{
+							"name": "Estado",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://ms-monitor-f87964936df8.herokuapp.com/estado",
+									"protocol": "https",
+									"host": [
+										"ms-monitor-f87964936df8",
+										"herokuapp",
+										"com"
+									],
+									"path": [
+										"estado"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Start",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "https://ms-monitor-f87964936df8.herokuapp.com/control/arrancar",
+									"protocol": "https",
+									"host": [
+										"ms-monitor-f87964936df8",
+										"herokuapp",
+										"com"
+									],
+									"path": [
+										"control",
+										"arrancar"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Stop",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "https://ms-monitor-f87964936df8.herokuapp.com/control/parar",
+									"protocol": "https",
+									"host": [
+										"ms-monitor-f87964936df8",
+										"herokuapp",
+										"com"
+									],
+									"path": [
+										"control",
+										"parar"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Balanceador",
+					"item": [
+						{
+							"name": "Estado",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://ms-balanceador-f32d0bb0ea21.herokuapp.com/estado",
+									"protocol": "https",
+									"host": [
+										"ms-balanceador-f32d0bb0ea21",
+										"herokuapp",
+										"com"
+									],
+									"path": [
+										"estado"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Pedido",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://ms-balanceador-f32d0bb0ea21.herokuapp.com/pedido/2",
+									"protocol": "https",
+									"host": [
+										"ms-balanceador-f32d0bb0ea21",
+										"herokuapp",
+										"com"
+									],
+									"path": [
+										"pedido",
+										"2"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		}
+	]
+}
