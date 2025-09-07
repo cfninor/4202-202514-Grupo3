@@ -1,5 +1,5 @@
-from .estado import VistaEstado 
+from .estado import VistaEstado, VistaControl
 
 __all__ = [
-    "VistaEstado"
+    "VistaEstado", "VistaControl"
 ]

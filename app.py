@@ -3,7 +3,7 @@ from flask_cors import CORS
 from flask_restful import Api
 
 from vistas import \
-    VistaEstado
+    VistaEstado, VistaControl
 
 app = Flask(__name__)
 app.config['PROPAGATE_EXCEPTIONS'] = True
@@ -15,3 +15,4 @@ cors = CORS(app)
 
 api = Api(app)
 api.add_resource(VistaEstado, '/estado')
+api.add_resource(VistaControl, '/control/<string:estado>')

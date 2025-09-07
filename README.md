@@ -60,3 +60,19 @@ flask run
     }
 }
 ```
+
+`POST /control/<string:estado>` - Activa o desactiva el servicio de monitor (Opciones: arrancar, parar)
+
+- ✅ Respuesta normal al activarlo:
+```json
+{
+    "estado": "experimento activado"
+}
+```
+
+- ✅ Respuesta normal al detenerlo:
+```json
+{
+    "estado": "experimento detenido"
+}
+```
