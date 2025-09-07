@@ -4,9 +4,6 @@
 
 Este proyecto implementa y valida un diseño de redundancia activa para un servicio de consulta de pedidos. El objetivo es demostrar que, mediante balanceo de carga y monitoreo con heartbeat, el sistema puede enmascarar la falla de una instancia y mantener la disponibilidad del servicio para el usuario final, incluso ante caídas.
 
-Se realizaron pruebas automatizadas con Postman, incluyendo 61 iteraciones y 122 tests, que permitieron analizar la disponibilidad, la latencia y el comportamiento del balanceador al retirar y reincorporar instancias.
-
-
 **Estructura de ramas**
 
     main
