@@ -1,0 +1,20 @@
+import os
+from flask import Flask
+from dotenv import load_dotenv
+from extensions import db
+from vistas.autorizacion import bp as autorizacion_bp
+
+load_dotenv()
+app = Flask(__name__)
+
+db_url = os.environ.get("DATABASE_URL")
+if not db_url:
+    raise RuntimeError("DATABASE_URL no está definido. Revisa tu .env")
+
+app.config["SQLALCHEMY_DATABASE_URI"] = db_url
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+db.init_app(app)
+app.register_blueprint(autorizacion_bp)
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=int(os.getenv("PORT", 5000)), debug=True)
