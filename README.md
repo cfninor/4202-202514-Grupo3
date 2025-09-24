@@ -35,7 +35,7 @@ Es el encargado de registrar todos los eventos recibidos por medio de un microse
 
 ###  🛠️ Configuración
 
-* **Desde el archivo .env se puede cambiar la configuración de las variables locales.**
+* **Desde el archivo .env se puede cambiar la configuración de las variables locales y desde .flaskenv las configuraciones de flask**
 
 ### 💻 Instalación local
 
