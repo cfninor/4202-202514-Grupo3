@@ -19,6 +19,7 @@ Permite hacer el login, control de acceso por rol y generar auditoria del inicio
  ┣---- 📂 vistas
  ┃     ┣---- 📜 autorizacion.py 
  ┣---- 📜 .env # Uso local, configuración de variables
+ ┣---- 📜 .flaskenv # Uso local, configuración de variables de flask
  ┣---- 📜 .gitignore
  ┣---- 📜 app.py
  ┣---- 📜 docker-compose.yml # Docker postgres
@@ -38,7 +39,7 @@ Permite hacer el login, control de acceso por rol y generar auditoria del inicio
 ###  🛠️ Configuración
 
 * **Desde el archivo docker-compose.yml se puede cambiar la configuración para Docker.**
-* **Desde el archivo .env se puede cambiar la configuración de las variables locales.**
+* **Desde el archivo .env se puede cambiar la configuración de las variables locales y desde .flaskenv las configuraciones de flask**
 
 ### 🐳 Uso con Docker
 
