@@ -2,7 +2,7 @@ import os
 from flask import Flask
 from dotenv import load_dotenv
 from extensions import db
-from vistas.alertas import bp as autorizacion_bp
+from vistas.alertas import bp as alerting_bp
 
 load_dotenv()
 app = Flask(__name__)
@@ -14,4 +14,4 @@ if not db_url:
 app.config["SQLALCHEMY_DATABASE_URI"] = db_url
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db.init_app(app)
-app.register_blueprint(autorizacion_bp)
+app.register_blueprint(alerting_bp)

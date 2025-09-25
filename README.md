@@ -2,22 +2,16 @@
 
 ## ALERTAS
 
-Este proyecto simula un **autenticador/autorizador** basado en Flask + JWT.
-
-Permite hacer el login, control de acceso por rol y generar auditoria del inicio de sesión.
-
+Este proyecto implementa un sistema de generación y gestión de alertas orientado al monitoreo de posibles intrusos en una aplicación. Utiliza Flask, permitiendo el registro de eventos. Además, facilita la auditoría y la visualización de alertas generadas, contribuyendo a la detección temprana eventos.
 ###  📁 Estructura del Proyecto
 
 ```
 📦 root
  ┣---- 📂 modelos
  ┃     ┣---- 📜 __init__.py 
- ┃     ┣---- 📜 recurso.py 
- ┃     ┣---- 📜 rol.py 
- ┃     ┣---- 📜 usuario_rol.py 
- ┃     ┣---- 📜 usuario.py 
+ ┃     ┣---- 📜 alertas.py 
  ┣---- 📂 vistas
- ┃     ┣---- 📜 autorizacion.py 
+ ┃     ┣---- 📜 alertas.py 
  ┣---- 📜 .env # Uso local, configuración de variables
  ┣---- 📜 .flaskenv # Uso local, configuración de variables de flask
  ┣---- 📜 .gitignore
@@ -25,6 +19,8 @@ Permite hacer el login, control de acceso por rol y generar auditoria del inicio
  ┣---- 📜 docker-compose.yml # Docker postgres
  ┣---- 📜 extensions.py
  ┣---- 📜 Procfile
+ ┣---- 📂 img
+       ┣---- 📜 img.png
  ┣---- 📜 README.md
  ┗---- 📜 requirements.txt
 
@@ -88,41 +84,51 @@ Respuesta:
 }
 ```
 
-`POST /login` - Servicio para iniciar sesión
+`POST /notificar` - Servicio para notificar alertas
 
 Request:
 ```json
 {
-    "usuario": "gerente1",
-    "contrasena": "Passw0rd!"
+    "titulo":"Warning",
+    "detalle":"Precaución con el servidor"
 }
 ```
 
 Respuesta:
 ```json
 {
-    "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJnZXJlbnRlMSIsInJvbCI6ImNvbWVyY2lhbCIsImlhdCI6MTc1ODU5ODkxOSwiZXhwIjoxNzU4NjAwNzE5fQ.Nx7qx22CFt5SGQ6q1SLylCBnFU4mNDQ_-5JySJuEuWk",
-    "rol": "comercial",
-    "roles": [
-        "comercial"
-    ]
+    "id": 3,
+    "ok": true
 }
 ```
 
-`POST /verificar` - Servicio para validar el rol
+`GET /alertas` - Servicio para obtener las alertas
 
-Request:
-```json
-{
-    "usuario": "gerente1",
-    "rol": "comercial"
-}
-```
 
 Respuesta:
 ```json
-{
-    "autorizado": true,
-    "rol_requerido": "comercial"
-}
+[
+    {
+        "detalle": "Warning",
+        "titulo": "Warning",
+        "ts": "2025-09-25T03:46:57.637701"
+    },
+    {
+        "detalle": "Warning",
+        "titulo": "Warning",
+        "ts": "2025-09-25T03:19:55.112709"
+    },
+    {
+        "detalle": "Prueba detalle",
+        "titulo": "Prueba titulo",
+        "ts": "2025-09-25T03:12:13.473461"
+    }
+]
 ```
+
+`GET /charts/alertas_por_regla.png` - Este servicio retorna una imagen PNG generada dinámicamente con un gráfico de barras que muestra la cantidad de alertas agrupadas por regla (campo titulo). La imagen se envía como respuesta HTTP con el tipo MIME image/png. Si no hay datos, retorna un error 404.
+
+
+Respuesta:
+![img.png](img/img.png)
+
