@@ -37,7 +37,7 @@ Los eventos a detectar son:
 * Intancia docker corriendo, leer README.md de la rama de autorizador
 * Python
 * pip 
-* PostgreSQL (**Si no se hace uso de Dcoker**)
+* PostgreSQL (**Si no se hace uso de Docker**)
 
 ###  🛠️ Configuración
 
