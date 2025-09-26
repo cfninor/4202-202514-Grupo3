@@ -1,12 +1,13 @@
 import os, json, time, threading
 from io import BytesIO
-from flask import Blueprint, request, jsonify, abort, send_file
+from flask import Blueprint, request, jsonify, abort, send_file, current_app
 from extensions import db
 import pandas as pd, requests
 from dateutil import tz
 import matplotlib; matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from modelos import Usuario, Hallazgo
+import logging
 
 bp = Blueprint("detector", __name__)
 ADMIN_SECRET = os.getenv("ADMIN_SECRET","detector-admin-secret")
@@ -15,8 +16,9 @@ EVENTOS_URL = f"{AUDITOR_URL}/eventos"
 HUELLAS_URL = f"{AUDITOR_URL}/huellas"
 ALERTAS_URL = os.environ["ALERTAS_URL"]
 IP_DIAS_VIGENTES = int(os.getenv("IP_DIAS_VIGENTES","30"))
-IP_DIVERSIDAD_UMBRAL = int(os.getenv("IP_DIVERSIDAD_UMBRAL","5"))
-RUN = {"on": False}
+IP_DIVERSIDAD_UMBRAL = int(os.getenv("IP_DIVERSIDAD_UMBRAL","1"))
+RUN = {"on": False, "wm_ts": None}
+log = logging.getLogger(__name__)
 
 REGLAS = {
   "fuera_horario": {"inicio": 6, "fin": 22},
@@ -25,8 +27,13 @@ REGLAS = {
 }
 
 def _tiempo_local(ts, tzname):
-    z = tz.gettz(tzname or "UTC")
-    return pd.Timestamp(ts).tz_localize("UTC").tz_convert(z).hour
+    z = tz.gettz(tzname or "UTC") or tz.gettz("UTC")
+    t = pd.Timestamp(ts)
+    if t.tzinfo is None:
+        t = t.tz_localize("UTC")
+    else:
+        pass
+    return t.tz_convert(z).hour
 
 def _validar_rol(df, anomalia, intentos):
     a_rol = df[(df.token_valido == True) & (df.autorizado == False)]
@@ -35,6 +42,7 @@ def _validar_rol(df, anomalia, intentos):
         a_rol["regla"] = "rol_no_pertenece";
         anomalia = pd.concat([anomalia, a_rol])
         intentos.add("rol_no_pertenece")
+    return anomalia
         
 def _validar_horario(df, anomalia, intentos):
     regla_horario = REGLAS["fuera_horario"]
@@ -44,6 +52,7 @@ def _validar_horario(df, anomalia, intentos):
         a_horario["regla"] = "usuario_fuera_horario";
         anomalia = pd.concat([anomalia, a_horario])
         intentos.add("usuario_fuera_horario")
+    return anomalia
         
 def _validar_intentos_min(df, anomalia, intentos):
     df["min"] = pd.to_datetime(df["ts_utc"]).dt.floor("min")
@@ -55,7 +64,8 @@ def _validar_intentos_min(df, anomalia, intentos):
     ki = gi[gi.c > REGLAS["rate_por_min"]["ip"]][["ip","min"]]
     if not ki.empty:
         a_intentos_ip = df.merge(ki,on=["ip","min"]); a_intentos_ip["regla"]="rate_ip_alto"; anomalia=pd.concat([anomalia,a_intentos_ip]); intentos.add("rate_ip_alto")
-
+    return anomalia
+    
 def _validar_ip_dias(df, anomalia, intentos):
     hu = requests.get(HUELLAS_URL+"?limit=50000", timeout=5).json()
     hu = pd.DataFrame(hu)
@@ -74,6 +84,7 @@ def _validar_ip_dias(df, anomalia, intentos):
             a_ip["regla"]="ip_nueva_usuario";
             anomalia=pd.concat([anomalia,a_ip]);
             intentos.add("ip_nueva_usuario");
+    return anomalia
             
 def _validar_ip_min(df, anomalia, intentos):
     win = pd.to_datetime(df["ts_utc"]).max() - pd.Timedelta(minutes=10)
@@ -83,14 +94,26 @@ def _validar_ip_min(df, anomalia, intentos):
     if not sosp.empty:
         a_ip_min = d10[d10["usuario"].isin(sosp)].copy(); a_ip_min["regla"]="ip_diversa_usuario"
         anomalia=pd.concat([anomalia,a_ip_min]); intentos.add("ip_diversa_usuario")
+    return anomalia
     
-def _validar_concurrencia(df, anomalia, intentos):
-    conc = df.groupby(["usuario","min"])["ip"].nunique().reset_index(name="n")
-    conc = conc[conc.n >= 2][["usuario","min"]]
+def _validar_concurrencia(df, anomalia, intentos, ventana="10s"):
+    if df.empty:
+        return anomalia
+    df_con = df.copy()
+    df_con["ts_utc"] = pd.to_datetime(df_con["ts_utc"], utc=True, errors="coerce")
+    df_con = df_con[df_con["ts_utc"].notna()]
+    df_con["ts_bucket"] = df_con["ts_utc"].dt.round(ventana)
+    conc = (df_con.groupby(["usuario", "ts_bucket"])["ip"]
+              .nunique()
+              .reset_index(name="n"))
+    conc = conc[conc["n"] >= 2][["usuario", "ts_bucket"]]
     if not conc.empty:
-        a_concurrencia = df.merge(conc, on=["usuario","min"])
-        a_concurrencia = a_concurrencia.copy(); a_concurrencia["regla"] = "concurrent_ips_usuario"
-        anomalia = pd.concat([anomalia,a_concurrencia]); intentos.add("concurrent_ips_usuario")
+        a_concurrencia = df_con.merge(conc, on=["usuario", "ts_bucket"], how="inner")
+        a_concurrencia = a_concurrencia.copy();
+        a_concurrencia["regla"] = "concurrent_ips_usuario";
+        anomalia = pd.concat([anomalia, a_concurrencia], ignore_index=True, sort=False) 
+        intentos.add("concurrent_ips_usuario")
+    return anomalia
     
 def _detectar_anomalias():
     try:
@@ -100,6 +123,14 @@ def _detectar_anomalias():
     if not eventos:
         return 0
     df = pd.DataFrame(eventos)
+    df["ts_utc"] = pd.to_datetime(df["ts_utc"], utc=True, errors="coerce")
+    df = df[df["ts_utc"].notna()]
+    wm = RUN.get("wm_ts")
+    if wm is not None:
+        df = df[df["ts_utc"] > wm]
+    if df.empty:
+        return 0
+    
     try:
         usuario = pd.read_sql(Usuario.query.statement, db.session.bind)[["usuario","zona_horaria"]]
         df = df.merge(usuario, how="left", on="usuario")
@@ -109,36 +140,54 @@ def _detectar_anomalias():
     df["hora_local"] = [_tiempo_local(ts, tz) for ts, tz in zip(df["ts_utc"], df["zona_horaria"])]
     anomalia = pd.DataFrame();
     intentos = set()
-    _validar_rol(df, anomalia, intentos)
-    _validar_horario(df, anomalia, intentos)
-    _validar_intentos_min(df, anomalia, intentos)
-    _validar_ip_dias(df, anomalia, intentos)
-    _validar_ip_min(df, anomalia, intentos)
-    _validar_concurrencia(df, anomalia, intentos)
+    anomalia =_validar_rol(df, anomalia, intentos)
+    anomalia = _validar_horario(df, anomalia, intentos)
+    anomalia = _validar_intentos_min(df, anomalia, intentos)
+    anomalia = _validar_ip_dias(df, anomalia, intentos)
+    anomalia = _validar_ip_min(df, anomalia, intentos)
+    anomalia = _validar_concurrencia(df, anomalia, intentos)
     
+    if not anomalia.empty:
+        cols_dedupe = [c for c in ["usuario","ip","ts_utc","recurso","metodo","regla"] if c in anomalia.columns]
+        anomalia = anomalia.drop_duplicates(subset=cols_dedupe, keep="first", ignore_index=True)
     total = len(anomalia)
     if total and len(intentos) >= REGLAS["corroboracion_minima"]:
-        muestra = anomalia.head(30).to_dict(orient="records")
-        db.session.add(Hallazgo(regla="detector", severidad="medio",
-                                total_eventos=int(total), muestra_json=json.dumps(muestra)))
+        muestra = json.loads(
+            anomalia.head(30).to_json(orient="records", date_format="iso")
+        )
+        db.session.add(Hallazgo(
+            regla="detector", severidad="medio",
+            total_eventos=int(total),
+            muestra_json=json.dumps(muestra, ensure_ascii=False)
+        ));
         db.session.commit()
         try:
             requests.post(ALERTAS_URL, json={"titulo":"Anomalías detectadas",
                 "detalle":{"total":int(total), "reglas":list(intentos), "muestra":muestra}}, timeout=3)
-        except Exception:
-            pass
+        except Exception as e:
+            log.warning(f"No se pudo enviar alerta: {e}")
+    RUN["wm_ts"] = max(RUN["wm_ts"], df["ts_utc"].max()) if RUN.get("wm_ts") is not None else df["ts_utc"].max()
     return total
 
 def _loop():
     while RUN["on"]:
-        _detectar_anomalias()
+        try:
+            _detectar_anomalias()
+            db.session.remove()
+        except Exception as e:
+            log.exception(f"Fallo en loop de detección: {e}")
         time.sleep(5)
+        
+def _loop_with_app(app):
+    with app.app_context():
+        _loop()
         
 @bp.route("/admin/start", methods=["POST"])
 def admin_start():
     if request.headers.get("X-Admin-Secret") != ADMIN_SECRET: abort(401)
     if not RUN["on"]:
-        RUN["on"]=True; threading.Thread(target=_loop, daemon=True).start()
+        app = current_app._get_current_object()
+        RUN["on"]=True; threading.Thread(target=_loop_with_app, args=(app,), daemon=True).start()
     return {"running": RUN["on"]}
 
 @bp.route("/admin/stop", methods=["POST"])
