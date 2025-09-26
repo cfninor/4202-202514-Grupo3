@@ -115,7 +115,8 @@ Request:
 ```json
 {
     "usuario": "gerente1",
-    "rol": "comercial"
+    "rol": "comercial",
+    "recurso":"historial"
 }
 ```
 
