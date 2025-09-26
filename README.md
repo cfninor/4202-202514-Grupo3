@@ -34,7 +34,7 @@ Permite hacer el login, control de acceso por rol y generar auditoria del inicio
 * Docker instalado
 * Python
 * pip 
-* PostgreSQL (**Si no se hace uso de Dcoker**)
+* PostgreSQL (**Si no se hace uso de Docker**)
 
 ###  🛠️ Configuración
 
