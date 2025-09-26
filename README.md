@@ -29,7 +29,7 @@ Este proyecto implementa un sistema de generación y gestión de alertas orienta
 * Intancia docker corriendo, leer README.md de la rama de autorizador
 * Python
 * pip 
-* PostgreSQL (**Si no se hace uso de Dcoker**)
+* PostgreSQL (**Si no se hace uso de Docker**)
 
 ###  🛠️ Configuración
 
