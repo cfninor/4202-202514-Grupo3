@@ -1,5 +1,11 @@
 # 4202-202514-Grupo3
 
+# Seguridad
+## Propósito del experimento
+
+
+# Disponibilidad
+
 ## Propósito del experimento
 
 Este proyecto implementa y valida un diseño de **redundancia activa** para un servicio de consulta de pedidos.  
