@@ -2,7 +2,7 @@ import os, json
 from io import BytesIO
 from flask import Blueprint, request, jsonify, abort, send_file
 from extensions import db
-from modelos.alertas import Alerta
+from modelos import Alerta
 import pandas as pd, matplotlib; matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
