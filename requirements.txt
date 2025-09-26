@@ -6,3 +6,4 @@ python-dateutil
 requests
 gunicorn
 matplotlib
+python-dotenv

@@ -83,21 +83,75 @@ Respuesta:
 }
 ```
 
-`POST /reglas` - 
+`POST /reglas` - Modifica las reglas en el sistema
 
 Request:
 ```json
-
+{
+    "IP_DIAS_VIGENTES": 30,
+    "IP_DIVERSIDAD_UMBRAL": 5,
+    "corroboracion_minima": 1,
+    "fuera_horario": {
+        "fin": 22,
+        "inicio": 6
+    },
+    "rate_por_min": {
+        "ip": 60,
+        "usuario": 30
+    }
+}
 ```
 
 Respuesta:
 ```json
-
+{
+    "IP_DIAS_VIGENTES": 30,
+    "IP_DIVERSIDAD_UMBRAL": 5,
+    "corroboracion_minima": 1,
+    "fuera_horario": {
+        "fin": 22,
+        "inicio": 6
+    },
+    "rate_por_min": {
+        "ip": 60,
+        "usuario": 30
+    }
+}
 ```
 
-`GET /reglas` - 
+`GET /reglas` - Devuelve las reglas configuradas
 
 Respuesta:
 ```json
+{
+    "IP_DIAS_VIGENTES": 30,
+    "IP_DIVERSIDAD_UMBRAL": 5,
+    "corroboracion_minima": 1,
+    "fuera_horario": {
+        "fin": 22,
+        "inicio": 6
+    },
+    "rate_por_min": {
+        "ip": 60,
+        "usuario": 30
+    }
+}
+```
 
+`POST /admin/start` - Inicia servicio de validación y detección de eventos
+
+Respuesta:
+```json
+{
+    "running": true
+}
+```
+
+`POST /admin/stop` - Finaliza servicio de validación y detección de eventos
+
+Respuesta:
+```json
+{
+    "running": false
+}
 ```
