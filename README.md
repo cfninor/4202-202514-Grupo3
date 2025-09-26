@@ -16,7 +16,6 @@ Este proyecto implementa un sistema de generación y gestión de alertas orienta
  ┣---- 📜 .flaskenv # Uso local, configuración de variables de flask
  ┣---- 📜 .gitignore
  ┣---- 📜 app.py
- ┣---- 📜 docker-compose.yml # Docker postgres
  ┣---- 📜 extensions.py
  ┣---- 📜 Procfile
  ┣---- 📂 img
@@ -27,22 +26,14 @@ Este proyecto implementa un sistema de generación y gestión de alertas orienta
 ```
 ###  📌 Requisitos
 
-* Docker instalado
+* Intancia docker corriendo, leer README.md de la rama de autorizador
 * Python
 * pip 
 * PostgreSQL (**Si no se hace uso de Dcoker**)
 
 ###  🛠️ Configuración
 
-* **Desde el archivo docker-compose.yml se puede cambiar la configuración para Docker.**
 * **Desde el archivo .env se puede cambiar la configuración de las variables locales y desde .flaskenv las configuraciones de flask**
-
-### 🐳 Uso con Docker
-
-1. Levantar la base de datos
-```bash
-docker compose up -d
-```
 
 ### 💻 Instalación local
 

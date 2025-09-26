@@ -7,7 +7,7 @@ import pandas as pd, matplotlib; matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 bp = Blueprint("alerting", __name__)
-ADMIN_SECRET = os.getenv("ADMIN_SECRET","dev")
+ADMIN_SECRET = os.getenv("ADMIN_SECRET","alertas-admin-secret")
 
 @bp.route("/admin/init", methods=["POST"])
 def admin_init():
@@ -37,7 +37,7 @@ def chart_reglas():
     df = pd.DataFrame(rec)
     if df.empty: abort(404)
     s = df.groupby("regla").size().sort_values(ascending=False)
-    fig = plt.figure(figsize=(6,3)); s.plot(kind="bar"); plt.title("Alertas por regla")
+    plt.figure(figsize=(6,3)); s.plot(kind="bar"); plt.title("Alertas por regla")
     plt.xlabel("Regla"); plt.ylabel("Total")
     buf = BytesIO(); plt.tight_layout(); plt.savefig(buf, format="png"); buf.seek(0)
     return send_file(buf, mimetype="image/png")
