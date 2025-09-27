@@ -8,312 +8,13 @@
 	},
 	"item": [
 		{
-			"name": "Local",
+			"name": "Disponibilidad",
 			"item": [
 				{
-					"name": "Servicio",
+					"name": "Local",
 					"item": [
 						{
-							"name": "Estado",
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "http://127.0.0.1:5000/estado?on=false",
-									"protocol": "http",
-									"host": [
-										"127",
-										"0",
-										"0",
-										"1"
-									],
-									"port": "5000",
-									"path": [
-										"estado"
-									],
-									"query": [
-										{
-											"key": "on",
-											"value": "false"
-										}
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Salud",
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "http://127.0.0.1:5000/salud",
-									"protocol": "http",
-									"host": [
-										"127",
-										"0",
-										"0",
-										"1"
-									],
-									"port": "5000",
-									"path": [
-										"salud"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Pedido",
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "http://127.0.0.1:5000/pedido/1",
-									"protocol": "http",
-									"host": [
-										"127",
-										"0",
-										"0",
-										"1"
-									],
-									"port": "5000",
-									"path": [
-										"pedido",
-										"1"
-									]
-								}
-							},
-							"response": []
-						}
-					]
-				},
-				{
-					"name": "Monitor",
-					"item": [
-						{
-							"name": "Estado",
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "http://127.0.0.1:5002/estado",
-									"protocol": "http",
-									"host": [
-										"127",
-										"0",
-										"0",
-										"1"
-									],
-									"port": "5002",
-									"path": [
-										"estado"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Start",
-							"request": {
-								"method": "POST",
-								"header": [],
-								"url": {
-									"raw": "http://127.0.0.1:5002/control/arrancar",
-									"protocol": "http",
-									"host": [
-										"127",
-										"0",
-										"0",
-										"1"
-									],
-									"port": "5002",
-									"path": [
-										"control",
-										"arrancar"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Stop",
-							"request": {
-								"method": "POST",
-								"header": [],
-								"url": {
-									"raw": "http://127.0.0.1:5002/control/parar",
-									"protocol": "http",
-									"host": [
-										"127",
-										"0",
-										"0",
-										"1"
-									],
-									"port": "5002",
-									"path": [
-										"control",
-										"parar"
-									]
-								}
-							},
-							"response": []
-						}
-					]
-				},
-				{
-					"name": "Balanceador",
-					"item": [
-						{
-							"name": "Estado",
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "http://127.0.0.1:5003/estado",
-									"protocol": "http",
-									"host": [
-										"127",
-										"0",
-										"0",
-										"1"
-									],
-									"port": "5003",
-									"path": [
-										"estado"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Pedido",
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "http://127.0.0.1:5003/pedido/1",
-									"protocol": "http",
-									"host": [
-										"127",
-										"0",
-										"0",
-										"1"
-									],
-									"port": "5003",
-									"path": [
-										"pedido",
-										"1"
-									]
-								}
-							},
-							"response": []
-						}
-					]
-				},
-				{
-					"name": "Prueba",
-					"item": [
-						{
-							"name": "Pedido",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
-											"",
-											"pm.test(\"Tiempo de respuesta <= 1000 ms\", () => {",
-											"  pm.expect(pm.response.responseTime).to.be.below(1000);",
-											"});",
-											"",
-											"const i = pm.info.iteration;",
-											"",
-											"// Validación extra del balanceador en ciertos puntos",
-											"if (i === 11 || i === 19 || i === 21 || i === 29 || i === 31 || i === 39 || i === 41 || i === 49 || i === 80 || i === 150 || i === 230 || i === 280) {",
-											"  pm.sendRequest('http://127.0.0.1:5003/estado', (err, res) => {",
-											"    pm.expect(err).to.be.null;",
-											"    pm.expect(res.code).to.eql(200);",
-											"  });",
-											"}",
-											""
-										],
-										"type": "text/javascript",
-										"packages": {}
-									}
-								},
-								{
-									"listen": "prerequest",
-									"script": {
-										"exec": [
-											"// Número de iteración en el Runner",
-											"const i = pm.info.iteration;",
-											"",
-											"// Iteración 20: apagar ms-pedidos-1",
-											"if (i === 20) {",
-											"  pm.sendRequest('http://127.0.0.1:5000/estado?on=true', () => {});",
-											"}",
-											"// Iteración 41: encender ms-pedidos-1",
-											"if (i === 41) {",
-											"  pm.sendRequest('http://127.0.0.1:5000/estado?on=false', () => {});",
-											"}",
-											"",
-											"// Iteración 120: apagar ms-pedidos-1",
-											"if (i === 120) {",
-											"  pm.sendRequest('http://127.0.0.1:5000/estado?on=true', () => {});",
-											"}",
-											"// Iteración 180: encender ms-pedidos-1",
-											"if (i === 180) {",
-											"  pm.sendRequest('http://127.0.0.1:5000/estado?on=false', () => {});",
-											"}",
-											"",
-											"// Iteración 210: apagar ms-pedidos-1",
-											"if (i === 210) {",
-											"  pm.sendRequest('http://127.0.0.1:5000/estado?on=true', () => {});",
-											"}",
-											"// Iteración 250: encender ms-pedidos-1",
-											"if (i === 250) {",
-											"  pm.sendRequest('http://127.0.0.1:5000/estado?on=false', () => {});",
-											"}"
-										],
-										"type": "text/javascript",
-										"packages": {}
-									}
-								}
-							],
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "http://127.0.0.1:5003/pedido/2",
-									"protocol": "http",
-									"host": [
-										"127",
-										"0",
-										"0",
-										"1"
-									],
-									"port": "5003",
-									"path": [
-										"pedido",
-										"2"
-									]
-								}
-							},
-							"response": []
-						}
-					]
-				}
-			]
-		},
-		{
-			"name": "Heroku",
-			"item": [
-				{
-					"name": "Servicio",
-					"item": [
-						{
-							"name": "ms-pedidos-1",
+							"name": "Servicio",
 							"item": [
 								{
 									"name": "Estado",
@@ -321,13 +22,15 @@
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "https://ms-pedidos-963475201021.herokuapp.com/estado?on=false",
-											"protocol": "https",
+											"raw": "http://127.0.0.1:5000/estado?on=false",
+											"protocol": "http",
 											"host": [
-												"ms-pedidos-963475201021",
-												"herokuapp",
-												"com"
+												"127",
+												"0",
+												"0",
+												"1"
 											],
+											"port": "5000",
 											"path": [
 												"estado"
 											],
@@ -347,13 +50,15 @@
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "https://ms-pedidos-963475201021.herokuapp.com/salud",
-											"protocol": "https",
+											"raw": "http://127.0.0.1:5000/salud",
+											"protocol": "http",
 											"host": [
-												"ms-pedidos-963475201021",
-												"herokuapp",
-												"com"
+												"127",
+												"0",
+												"0",
+												"1"
 											],
+											"port": "5000",
 											"path": [
 												"salud"
 											]
@@ -367,85 +72,15 @@
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "https://ms-pedidos-963475201021.herokuapp.com/pedido/3",
-											"protocol": "https",
+											"raw": "http://127.0.0.1:5000/pedido/1",
+											"protocol": "http",
 											"host": [
-												"ms-pedidos-963475201021",
-												"herokuapp",
-												"com"
+												"127",
+												"0",
+												"0",
+												"1"
 											],
-											"path": [
-												"pedido",
-												"3"
-											]
-										}
-									},
-									"response": []
-								}
-							]
-						},
-						{
-							"name": "ms-pedidos-2",
-							"item": [
-								{
-									"name": "Estado",
-									"request": {
-										"method": "GET",
-										"header": [],
-										"url": {
-											"raw": "https://ms-pedidos-2-dd9c310b700c.herokuapp.com/estado?on=false",
-											"protocol": "https",
-											"host": [
-												"ms-pedidos-2-dd9c310b700c",
-												"herokuapp",
-												"com"
-											],
-											"path": [
-												"estado"
-											],
-											"query": [
-												{
-													"key": "on",
-													"value": "false"
-												}
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "Salud",
-									"request": {
-										"method": "GET",
-										"header": [],
-										"url": {
-											"raw": "https://ms-pedidos-2-dd9c310b700c.herokuapp.com/salud",
-											"protocol": "https",
-											"host": [
-												"ms-pedidos-2-dd9c310b700c",
-												"herokuapp",
-												"com"
-											],
-											"path": [
-												"salud"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "Pedido",
-									"request": {
-										"method": "GET",
-										"header": [],
-										"url": {
-											"raw": "https://ms-pedidos-2-dd9c310b700c.herokuapp.com/pedido/1",
-											"protocol": "https",
-											"host": [
-												"ms-pedidos-2-dd9c310b700c",
-												"herokuapp",
-												"com"
-											],
+											"port": "5000",
 											"path": [
 												"pedido",
 												"1"
@@ -455,123 +90,1869 @@
 									"response": []
 								}
 							]
+						},
+						{
+							"name": "Monitor",
+							"item": [
+								{
+									"name": "Estado",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "http://127.0.0.1:5002/estado",
+											"protocol": "http",
+											"host": [
+												"127",
+												"0",
+												"0",
+												"1"
+											],
+											"port": "5002",
+											"path": [
+												"estado"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Start",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"url": {
+											"raw": "http://127.0.0.1:5002/control/arrancar",
+											"protocol": "http",
+											"host": [
+												"127",
+												"0",
+												"0",
+												"1"
+											],
+											"port": "5002",
+											"path": [
+												"control",
+												"arrancar"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Stop",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"url": {
+											"raw": "http://127.0.0.1:5002/control/parar",
+											"protocol": "http",
+											"host": [
+												"127",
+												"0",
+												"0",
+												"1"
+											],
+											"port": "5002",
+											"path": [
+												"control",
+												"parar"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Balanceador",
+							"item": [
+								{
+									"name": "Estado",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "http://127.0.0.1:5003/estado",
+											"protocol": "http",
+											"host": [
+												"127",
+												"0",
+												"0",
+												"1"
+											],
+											"port": "5003",
+											"path": [
+												"estado"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Pedido",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "http://127.0.0.1:5003/pedido/1",
+											"protocol": "http",
+											"host": [
+												"127",
+												"0",
+												"0",
+												"1"
+											],
+											"port": "5003",
+											"path": [
+												"pedido",
+												"1"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Prueba",
+							"item": [
+								{
+									"name": "Pedido",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+													"",
+													"pm.test(\"Tiempo de respuesta <= 1000 ms\", () => {",
+													"  pm.expect(pm.response.responseTime).to.be.below(1000);",
+													"});",
+													"",
+													"const i = pm.info.iteration;",
+													"",
+													"// Validación extra del balanceador en ciertos puntos",
+													"if (i === 11 || i === 19 || i === 21 || i === 29 || i === 31 || i === 39 || i === 41 || i === 49 || i === 80 || i === 150 || i === 230 || i === 280) {",
+													"  pm.sendRequest('http://127.0.0.1:5003/estado', (err, res) => {",
+													"    pm.expect(err).to.be.null;",
+													"    pm.expect(res.code).to.eql(200);",
+													"  });",
+													"}",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"// Número de iteración en el Runner",
+													"const i = pm.info.iteration;",
+													"",
+													"// Iteración 20: apagar ms-pedidos-1",
+													"if (i === 20) {",
+													"  pm.sendRequest('http://127.0.0.1:5000/estado?on=true', () => {});",
+													"}",
+													"// Iteración 41: encender ms-pedidos-1",
+													"if (i === 41) {",
+													"  pm.sendRequest('http://127.0.0.1:5000/estado?on=false', () => {});",
+													"}",
+													"",
+													"// Iteración 120: apagar ms-pedidos-1",
+													"if (i === 120) {",
+													"  pm.sendRequest('http://127.0.0.1:5000/estado?on=true', () => {});",
+													"}",
+													"// Iteración 180: encender ms-pedidos-1",
+													"if (i === 180) {",
+													"  pm.sendRequest('http://127.0.0.1:5000/estado?on=false', () => {});",
+													"}",
+													"",
+													"// Iteración 210: apagar ms-pedidos-1",
+													"if (i === 210) {",
+													"  pm.sendRequest('http://127.0.0.1:5000/estado?on=true', () => {});",
+													"}",
+													"// Iteración 250: encender ms-pedidos-1",
+													"if (i === 250) {",
+													"  pm.sendRequest('http://127.0.0.1:5000/estado?on=false', () => {});",
+													"}"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "http://127.0.0.1:5003/pedido/2",
+											"protocol": "http",
+											"host": [
+												"127",
+												"0",
+												"0",
+												"1"
+											],
+											"port": "5003",
+											"path": [
+												"pedido",
+												"2"
+											]
+										}
+									},
+									"response": []
+								}
+							]
 						}
 					]
 				},
 				{
-					"name": "Monitor",
+					"name": "Heroku",
 					"item": [
 						{
-							"name": "Estado",
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "https://ms-monitor-f87964936df8.herokuapp.com/estado",
-									"protocol": "https",
-									"host": [
-										"ms-monitor-f87964936df8",
-										"herokuapp",
-										"com"
-									],
-									"path": [
-										"estado"
+							"name": "Servicio",
+							"item": [
+								{
+									"name": "ms-pedidos-1",
+									"item": [
+										{
+											"name": "Estado",
+											"request": {
+												"method": "GET",
+												"header": [],
+												"url": {
+													"raw": "https://ms-pedidos-963475201021.herokuapp.com/estado?on=false",
+													"protocol": "https",
+													"host": [
+														"ms-pedidos-963475201021",
+														"herokuapp",
+														"com"
+													],
+													"path": [
+														"estado"
+													],
+													"query": [
+														{
+															"key": "on",
+															"value": "false"
+														}
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "Salud",
+											"request": {
+												"method": "GET",
+												"header": [],
+												"url": {
+													"raw": "https://ms-pedidos-963475201021.herokuapp.com/salud",
+													"protocol": "https",
+													"host": [
+														"ms-pedidos-963475201021",
+														"herokuapp",
+														"com"
+													],
+													"path": [
+														"salud"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "Pedido",
+											"request": {
+												"method": "GET",
+												"header": [],
+												"url": {
+													"raw": "https://ms-pedidos-963475201021.herokuapp.com/pedido/3",
+													"protocol": "https",
+													"host": [
+														"ms-pedidos-963475201021",
+														"herokuapp",
+														"com"
+													],
+													"path": [
+														"pedido",
+														"3"
+													]
+												}
+											},
+											"response": []
+										}
+									]
+								},
+								{
+									"name": "ms-pedidos-2",
+									"item": [
+										{
+											"name": "Estado",
+											"request": {
+												"method": "GET",
+												"header": [],
+												"url": {
+													"raw": "https://ms-pedidos-2-dd9c310b700c.herokuapp.com/estado?on=false",
+													"protocol": "https",
+													"host": [
+														"ms-pedidos-2-dd9c310b700c",
+														"herokuapp",
+														"com"
+													],
+													"path": [
+														"estado"
+													],
+													"query": [
+														{
+															"key": "on",
+															"value": "false"
+														}
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "Salud",
+											"request": {
+												"method": "GET",
+												"header": [],
+												"url": {
+													"raw": "https://ms-pedidos-2-dd9c310b700c.herokuapp.com/salud",
+													"protocol": "https",
+													"host": [
+														"ms-pedidos-2-dd9c310b700c",
+														"herokuapp",
+														"com"
+													],
+													"path": [
+														"salud"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "Pedido",
+											"request": {
+												"method": "GET",
+												"header": [],
+												"url": {
+													"raw": "https://ms-pedidos-2-dd9c310b700c.herokuapp.com/pedido/1",
+													"protocol": "https",
+													"host": [
+														"ms-pedidos-2-dd9c310b700c",
+														"herokuapp",
+														"com"
+													],
+													"path": [
+														"pedido",
+														"1"
+													]
+												}
+											},
+											"response": []
+										}
 									]
 								}
-							},
-							"response": []
+							]
 						},
 						{
-							"name": "Start",
-							"request": {
-								"method": "POST",
-								"header": [],
-								"url": {
-									"raw": "https://ms-monitor-f87964936df8.herokuapp.com/control/arrancar",
-									"protocol": "https",
-									"host": [
-										"ms-monitor-f87964936df8",
-										"herokuapp",
-										"com"
-									],
-									"path": [
-										"control",
-										"arrancar"
-									]
+							"name": "Monitor",
+							"item": [
+								{
+									"name": "Estado",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "https://ms-monitor-f87964936df8.herokuapp.com/estado",
+											"protocol": "https",
+											"host": [
+												"ms-monitor-f87964936df8",
+												"herokuapp",
+												"com"
+											],
+											"path": [
+												"estado"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Start",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"url": {
+											"raw": "https://ms-monitor-f87964936df8.herokuapp.com/control/arrancar",
+											"protocol": "https",
+											"host": [
+												"ms-monitor-f87964936df8",
+												"herokuapp",
+												"com"
+											],
+											"path": [
+												"control",
+												"arrancar"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Stop",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"url": {
+											"raw": "https://ms-monitor-f87964936df8.herokuapp.com/control/parar",
+											"protocol": "https",
+											"host": [
+												"ms-monitor-f87964936df8",
+												"herokuapp",
+												"com"
+											],
+											"path": [
+												"control",
+												"parar"
+											]
+										}
+									},
+									"response": []
 								}
-							},
-							"response": []
+							]
 						},
 						{
-							"name": "Stop",
-							"request": {
-								"method": "POST",
-								"header": [],
-								"url": {
-									"raw": "https://ms-monitor-f87964936df8.herokuapp.com/control/parar",
-									"protocol": "https",
-									"host": [
-										"ms-monitor-f87964936df8",
-										"herokuapp",
-										"com"
-									],
-									"path": [
-										"control",
-										"parar"
-									]
+							"name": "Balanceador",
+							"item": [
+								{
+									"name": "Estado",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "https://ms-balanceador-f32d0bb0ea21.herokuapp.com/estado",
+											"protocol": "https",
+											"host": [
+												"ms-balanceador-f32d0bb0ea21",
+												"herokuapp",
+												"com"
+											],
+											"path": [
+												"estado"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Pedido",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "https://ms-balanceador-f32d0bb0ea21.herokuapp.com/pedido/2",
+											"protocol": "https",
+											"host": [
+												"ms-balanceador-f32d0bb0ea21",
+												"herokuapp",
+												"com"
+											],
+											"path": [
+												"pedido",
+												"2"
+											]
+										}
+									},
+									"response": []
 								}
-							},
-							"response": []
-						}
-					]
-				},
-				{
-					"name": "Balanceador",
-					"item": [
-						{
-							"name": "Estado",
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "https://ms-balanceador-f32d0bb0ea21.herokuapp.com/estado",
-									"protocol": "https",
-									"host": [
-										"ms-balanceador-f32d0bb0ea21",
-										"herokuapp",
-										"com"
-									],
-									"path": [
-										"estado"
-									]
-								}
-							},
-							"response": []
+							]
 						},
 						{
-							"name": "Pedido",
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "https://ms-balanceador-f32d0bb0ea21.herokuapp.com/pedido/2",
-									"protocol": "https",
-									"host": [
-										"ms-balanceador-f32d0bb0ea21",
-										"herokuapp",
-										"com"
+							"name": "Prueba",
+							"item": [
+								{
+									"name": "Pedido",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+													"",
+													"pm.test(\"Tiempo de respuesta <= 1000 ms\", () => {",
+													"  pm.expect(pm.response.responseTime).to.be.below(1000);",
+													"});",
+													"",
+													"const i = pm.info.iteration;",
+													"",
+													"// Validación extra del balanceador en ciertos puntos",
+													"if (i === 11 || i === 19 || i === 21 || i === 29 || i === 31 || i === 39 || i === 41 || i === 49 || i === 80 || i === 150 || i === 230 || i === 280) {",
+													"  pm.sendRequest('https://ms-balanceador-f32d0bb0ea21.herokuapp.com/estado', (err, res) => {",
+													"    pm.expect(err).to.be.null;",
+													"    pm.expect(res.code).to.eql(200);",
+													"  });",
+													"}",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"// Número de iteración en el Runner",
+													"const i = pm.info.iteration;",
+													"",
+													"// Iteración 20: apagar ms-pedidos-1",
+													"if (i === 20) {",
+													"  pm.sendRequest('https://ms-pedidos-963475201021.herokuapp.com/estado?on=true', () => {});",
+													"}",
+													"// Iteración 41: encender ms-pedidos-1",
+													"if (i === 41) {",
+													"  pm.sendRequest('https://ms-pedidos-963475201021.herokuapp.com/estado?on=false', () => {});",
+													"}",
+													"",
+													"// Iteración 120: apagar ms-pedidos-1",
+													"if (i === 120) {",
+													"  pm.sendRequest('https://ms-pedidos-963475201021.herokuapp.com/estado?on=true', () => {});",
+													"}",
+													"// Iteración 180: encender ms-pedidos-1",
+													"if (i === 180) {",
+													"  pm.sendRequest('https://ms-pedidos-963475201021.herokuapp.com/estado?on=false', () => {});",
+													"}",
+													"",
+													"// Iteración 210: apagar ms-pedidos-1",
+													"if (i === 210) {",
+													"  pm.sendRequest('https://ms-pedidos-963475201021.herokuapp.com/estado?on=true', () => {});",
+													"}",
+													"// Iteración 250: encender ms-pedidos-1",
+													"if (i === 250) {",
+													"  pm.sendRequest('https://ms-pedidos-963475201021.herokuapp.com/estado?on=false', () => {});",
+													"}"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
 									],
-									"path": [
-										"pedido",
-										"2"
-									]
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "http://127.0.0.1:5003/pedido/2",
+											"protocol": "http",
+											"host": [
+												"127",
+												"0",
+												"0",
+												"1"
+											],
+											"port": "5003",
+											"path": [
+												"pedido",
+												"2"
+											]
+										}
+									},
+									"response": []
 								}
-							},
-							"response": []
+							]
 						}
 					]
 				}
 			]
+		},
+		{
+			"name": "Seguridad",
+			"item": [
+				{
+					"name": "Local",
+					"item": [
+						{
+							"name": "Autorizador",
+							"item": [
+								{
+									"name": "health",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "http://127.0.0.1:5000/",
+											"protocol": "http",
+											"host": [
+												"127",
+												"0",
+												"0",
+												"1"
+											],
+											"port": "5000",
+											"path": [
+												""
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Init",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "X-Admin-Secret",
+												"value": "autorizador-admin-secret",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "http://127.0.0.1:5000/admin/init",
+											"protocol": "http",
+											"host": [
+												"127",
+												"0",
+												"0",
+												"1"
+											],
+											"port": "5000",
+											"path": [
+												"admin",
+												"init"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "login",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"let json = pm.response.json();\r",
+													"pm.collectionVariables.set(\"token\", json.access_token);\r",
+													"pm.collectionVariables.set(\"rol\", json.rol);"
+												],
+												"type": "text/javascript",
+												"packages": {},
+												"requests": {}
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "X-Forwarded-For",
+												"value": "8.8.8.8",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"usuario\": \"gerente1\",\r\n    \"contrasena\": \"Passw0rd!\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "http://127.0.0.1:5000/login",
+											"protocol": "http",
+											"host": [
+												"127",
+												"0",
+												"0",
+												"1"
+											],
+											"port": "5000",
+											"path": [
+												"login"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "verificar",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"usuario\": \"gerente1\",\r\n    \"rol\": \"comercial\",\r\n    \"recurso\":\"historial\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "http://127.0.0.1:5000/verificar",
+											"protocol": "http",
+											"host": [
+												"127",
+												"0",
+												"0",
+												"1"
+											],
+											"port": "5000",
+											"path": [
+												"verificar"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Auditor",
+							"item": [
+								{
+									"name": "health",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "http://127.0.0.1:5001/",
+											"protocol": "http",
+											"host": [
+												"127",
+												"0",
+												"0",
+												"1"
+											],
+											"port": "5001",
+											"path": [
+												""
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Init",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "X-Admin-Secret",
+												"value": "auditoria-admin-secret",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "http://127.0.0.1:5001/admin/init",
+											"protocol": "http",
+											"host": [
+												"127",
+												"0",
+												"0",
+												"1"
+											],
+											"port": "5001",
+											"path": [
+												"admin",
+												"init"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "eventos",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "http://127.0.0.1:5001/eventos",
+											"protocol": "http",
+											"host": [
+												"127",
+												"0",
+												"0",
+												"1"
+											],
+											"port": "5001",
+											"path": [
+												"eventos"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "huellas",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "http://127.0.0.1:5001/huellas",
+											"protocol": "http",
+											"host": [
+												"127",
+												"0",
+												"0",
+												"1"
+											],
+											"port": "5001",
+											"path": [
+												"huellas"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Deteccion",
+							"item": [
+								{
+									"name": "Health",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "http://127.0.0.1:5002/",
+											"protocol": "http",
+											"host": [
+												"127",
+												"0",
+												"0",
+												"1"
+											],
+											"port": "5002",
+											"path": [
+												""
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Init",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "X-Admin-Secret",
+												"value": "detector-admin-secret",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "http://127.0.0.1:5002/admin/init",
+											"protocol": "http",
+											"host": [
+												"127",
+												"0",
+												"0",
+												"1"
+											],
+											"port": "5002",
+											"path": [
+												"admin",
+												"init"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "reglas",
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "X-Admin-Secret",
+												"value": "detector-admin-secret",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "http://127.0.0.1:5002/reglas",
+											"protocol": "http",
+											"host": [
+												"127",
+												"0",
+												"0",
+												"1"
+											],
+											"port": "5002",
+											"path": [
+												"reglas"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "modificarReglas",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "X-Admin-Secret",
+												"value": "detector-admin-secret",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"IP_DIAS_VIGENTES\": 30,\r\n    \"IP_DIVERSIDAD_UMBRAL\": 5,\r\n    \"corroboracion_minima\": 1,\r\n    \"fuera_horario\": {\r\n        \"fin\": 22,\r\n        \"inicio\": 6\r\n    },\r\n    \"rate_por_min\": {\r\n        \"ip\": 60,\r\n        \"usuario\": 30\r\n    }\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "http://127.0.0.1:5002/reglas",
+											"protocol": "http",
+											"host": [
+												"127",
+												"0",
+												"0",
+												"1"
+											],
+											"port": "5002",
+											"path": [
+												"reglas"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "chart-Eventos",
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "X-Admin-Secret",
+												"value": "detector-admin-secret",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "http://127.0.0.1:5002/charts/eventos_por_min.png",
+											"protocol": "http",
+											"host": [
+												"127",
+												"0",
+												"0",
+												"1"
+											],
+											"port": "5002",
+											"path": [
+												"charts",
+												"eventos_por_min.png"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "start",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "X-Admin-Secret",
+												"value": "detector-admin-secret",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "http://127.0.0.1:5002/admin/start",
+											"protocol": "http",
+											"host": [
+												"127",
+												"0",
+												"0",
+												"1"
+											],
+											"port": "5002",
+											"path": [
+												"admin",
+												"start"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "stop",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "X-Admin-Secret",
+												"value": "detector-admin-secret",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "http://127.0.0.1:5002/admin/stop",
+											"protocol": "http",
+											"host": [
+												"127",
+												"0",
+												"0",
+												"1"
+											],
+											"port": "5002",
+											"path": [
+												"admin",
+												"stop"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Alertas",
+							"item": [
+								{
+									"name": "health",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "http://127.0.0.1:5003/",
+											"protocol": "http",
+											"host": [
+												"127",
+												"0",
+												"0",
+												"1"
+											],
+											"port": "5003",
+											"path": [
+												""
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Init",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "X-Admin-Secret",
+												"value": "alertas-admin-secret",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "http://127.0.0.1:5003/admin/init",
+											"protocol": "http",
+											"host": [
+												"127",
+												"0",
+												"0",
+												"1"
+											],
+											"port": "5003",
+											"path": [
+												"admin",
+												"init"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "notificar",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"titulo\":\"Warning\",\r\n    \"detalle\":\"Precaución con el servidor\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "http://127.0.0.1:5003/notificar",
+											"protocol": "http",
+											"host": [
+												"127",
+												"0",
+												"0",
+												"1"
+											],
+											"port": "5003",
+											"path": [
+												"notificar"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "alertas",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "http://127.0.0.1:5003/alertas",
+											"protocol": "http",
+											"host": [
+												"127",
+												"0",
+												"0",
+												"1"
+											],
+											"port": "5003",
+											"path": [
+												"alertas"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "chart-Alerta",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "http://127.0.0.1:5003/charts/alertas_por_regla.png",
+											"protocol": "http",
+											"host": [
+												"127",
+												"0",
+												"0",
+												"1"
+											],
+											"port": "5003",
+											"path": [
+												"charts",
+												"alertas_por_regla.png"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Historial",
+							"item": [
+								{
+									"name": "health",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "http://127.0.0.1:5004/",
+											"protocol": "http",
+											"host": [
+												"127",
+												"0",
+												"0",
+												"1"
+											],
+											"port": "5004",
+											"path": [
+												""
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "historial",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "http://127.0.0.1:5004/historial/gerente1",
+											"protocol": "http",
+											"host": [
+												"127",
+												"0",
+												"0",
+												"1"
+											],
+											"port": "5004",
+											"path": [
+												"historial",
+												"gerente1"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "Heroku",
+					"item": [
+						{
+							"name": "Auditor",
+							"item": [
+								{
+									"name": "health",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "https://ms-auditor-5e5cde42c3d4.herokuapp.com/",
+											"protocol": "https",
+											"host": [
+												"ms-auditor-5e5cde42c3d4",
+												"herokuapp",
+												"com"
+											],
+											"path": [
+												""
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Init",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "X-Admin-Secret",
+												"value": "auditoria-admin-secret",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "https://ms-auditor-5e5cde42c3d4.herokuapp.com/admin/init",
+											"protocol": "https",
+											"host": [
+												"ms-auditor-5e5cde42c3d4",
+												"herokuapp",
+												"com"
+											],
+											"path": [
+												"admin",
+												"init"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "eventos",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "https://ms-auditor-5e5cde42c3d4.herokuapp.com/eventos",
+											"protocol": "https",
+											"host": [
+												"ms-auditor-5e5cde42c3d4",
+												"herokuapp",
+												"com"
+											],
+											"path": [
+												"eventos"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "huellas",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "https://ms-auditor-5e5cde42c3d4.herokuapp.com/huellas",
+											"protocol": "https",
+											"host": [
+												"ms-auditor-5e5cde42c3d4",
+												"herokuapp",
+												"com"
+											],
+											"path": [
+												"huellas"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Autorizador",
+							"item": [
+								{
+									"name": "health",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "https://ms-autorizador-8ab3fabee52e.herokuapp.com/",
+											"protocol": "https",
+											"host": [
+												"ms-autorizador-8ab3fabee52e",
+												"herokuapp",
+												"com"
+											],
+											"path": [
+												""
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Init",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "X-Admin-Secret",
+												"value": "autorizador-admin-secret",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "https://ms-autorizador-8ab3fabee52e.herokuapp.com/admin/init",
+											"protocol": "https",
+											"host": [
+												"ms-autorizador-8ab3fabee52e",
+												"herokuapp",
+												"com"
+											],
+											"path": [
+												"admin",
+												"init"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "login",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"let json = pm.response.json();\r",
+													"pm.collectionVariables.set(\"token\", json.access_token);\r",
+													"pm.collectionVariables.set(\"rol\", json.rol);"
+												],
+												"type": "text/javascript",
+												"packages": {},
+												"requests": {}
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "X-Forwarded-For",
+												"value": "8.8.8.8",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"usuario\": \"gerente1\",\r\n    \"contrasena\": \"Passw0rd!\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://ms-autorizador-8ab3fabee52e.herokuapp.com/login",
+											"protocol": "https",
+											"host": [
+												"ms-autorizador-8ab3fabee52e",
+												"herokuapp",
+												"com"
+											],
+											"path": [
+												"login"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "verificar",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"usuario\": \"gerente1\",\r\n    \"rol\": \"comercial\",\r\n    \"recurso\":\"historial\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://ms-autorizador-8ab3fabee52e.herokuapp.com/verificar",
+											"protocol": "https",
+											"host": [
+												"ms-autorizador-8ab3fabee52e",
+												"herokuapp",
+												"com"
+											],
+											"path": [
+												"verificar"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Alertas",
+							"item": [
+								{
+									"name": "health",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "https://ms-alertas-d808ebcc0208.herokuapp.com/",
+											"protocol": "https",
+											"host": [
+												"ms-alertas-d808ebcc0208",
+												"herokuapp",
+												"com"
+											],
+											"path": [
+												""
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Init",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "X-Admin-Secret",
+												"value": "alertas-admin-secret",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "https://ms-alertas-d808ebcc0208.herokuapp.com/admin/init",
+											"protocol": "https",
+											"host": [
+												"ms-alertas-d808ebcc0208",
+												"herokuapp",
+												"com"
+											],
+											"path": [
+												"admin",
+												"init"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "notificar",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"titulo\":\"Warning\",\r\n    \"detalle\":\"Precaución con el servidor\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://ms-alertas-d808ebcc0208.herokuapp.com/notificar",
+											"protocol": "https",
+											"host": [
+												"ms-alertas-d808ebcc0208",
+												"herokuapp",
+												"com"
+											],
+											"path": [
+												"notificar"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "alertas",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "https://ms-alertas-d808ebcc0208.herokuapp.com/alertas",
+											"protocol": "https",
+											"host": [
+												"ms-alertas-d808ebcc0208",
+												"herokuapp",
+												"com"
+											],
+											"path": [
+												"alertas"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "chart-Alerta",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "https://ms-alertas-d808ebcc0208.herokuapp.com/charts/alertas_por_regla.png",
+											"protocol": "https",
+											"host": [
+												"ms-alertas-d808ebcc0208",
+												"herokuapp",
+												"com"
+											],
+											"path": [
+												"charts",
+												"alertas_por_regla.png"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Deteccion",
+							"item": [
+								{
+									"name": "Health",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "https://ms-deteccion-dd508c11efd0.herokuapp.com/",
+											"protocol": "https",
+											"host": [
+												"ms-deteccion-dd508c11efd0",
+												"herokuapp",
+												"com"
+											],
+											"path": [
+												""
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Init",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "X-Admin-Secret",
+												"value": "detector-admin-secret",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "https://ms-deteccion-dd508c11efd0.herokuapp.com/admin/init",
+											"protocol": "https",
+											"host": [
+												"ms-deteccion-dd508c11efd0",
+												"herokuapp",
+												"com"
+											],
+											"path": [
+												"admin",
+												"init"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "reglas",
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "X-Admin-Secret",
+												"value": "detector-admin-secret",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "https://ms-deteccion-dd508c11efd0.herokuapp.com/reglas",
+											"protocol": "https",
+											"host": [
+												"ms-deteccion-dd508c11efd0",
+												"herokuapp",
+												"com"
+											],
+											"path": [
+												"reglas"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "modificarReglas",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "X-Admin-Secret",
+												"value": "detector-admin-secret",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"IP_DIAS_VIGENTES\": 30,\r\n    \"IP_DIVERSIDAD_UMBRAL\": 5,\r\n    \"corroboracion_minima\": 1,\r\n    \"fuera_horario\": {\r\n        \"fin\": 22,\r\n        \"inicio\": 6\r\n    },\r\n    \"rate_por_min\": {\r\n        \"ip\": 60,\r\n        \"usuario\": 30\r\n    }\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://ms-deteccion-dd508c11efd0.herokuapp.com/reglas",
+											"protocol": "https",
+											"host": [
+												"ms-deteccion-dd508c11efd0",
+												"herokuapp",
+												"com"
+											],
+											"path": [
+												"reglas"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "chart-Eventos",
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "X-Admin-Secret",
+												"value": "detector-admin-secret",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "https://ms-deteccion-dd508c11efd0.herokuapp.com/charts/eventos_por_min.png",
+											"protocol": "https",
+											"host": [
+												"ms-deteccion-dd508c11efd0",
+												"herokuapp",
+												"com"
+											],
+											"path": [
+												"charts",
+												"eventos_por_min.png"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "start",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "X-Admin-Secret",
+												"value": "detector-admin-secret",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "https://ms-deteccion-dd508c11efd0.herokuapp.com/admin/start",
+											"protocol": "https",
+											"host": [
+												"ms-deteccion-dd508c11efd0",
+												"herokuapp",
+												"com"
+											],
+											"path": [
+												"admin",
+												"start"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "stop",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "X-Admin-Secret",
+												"value": "detector-admin-secret",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "https://ms-deteccion-dd508c11efd0.herokuapp.com/admin/stop",
+											"protocol": "https",
+											"host": [
+												"ms-deteccion-dd508c11efd0",
+												"herokuapp",
+												"com"
+											],
+											"path": [
+												"admin",
+												"stop"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Historial",
+							"item": [
+								{
+									"name": "health",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "https://ms-historial-9e2faa250d81.herokuapp.com/",
+											"protocol": "https",
+											"host": [
+												"ms-historial-9e2faa250d81",
+												"herokuapp",
+												"com"
+											],
+											"path": [
+												""
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "historial",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "https://ms-historial-9e2faa250d81.herokuapp.com/historial/gerente1",
+											"protocol": "https",
+											"host": [
+												"ms-historial-9e2faa250d81",
+												"herokuapp",
+												"com"
+											],
+											"path": [
+												"historial",
+												"gerente1"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "token",
+			"value": ""
+		},
+		{
+			"key": "rol",
+			"value": ""
 		}
 	]
 }
