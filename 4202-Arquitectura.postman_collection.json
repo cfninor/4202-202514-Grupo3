@@ -1915,6 +1915,269 @@
 									"response": []
 								}
 							]
+						},
+						{
+							"name": "Experimento",
+							"item": [
+								{
+									"name": "login ip1",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"let json = pm.response.json();\r",
+													"pm.collectionVariables.set(\"token\", json.access_token);\r",
+													"pm.collectionVariables.set(\"rol\", json.rol);"
+												],
+												"type": "text/javascript",
+												"packages": {},
+												"requests": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"// Tomar IP1 desde la fila del CSV",
+													"const ip1 = pm.iterationData.get('ip1');",
+													"if (ip1) pm.request.headers.upsert({ key: 'X-Forwarded-For', value: String(ip1) });",
+													"",
+													"// Correlation ID",
+													"pm.request.headers.upsert({ key: 'X-Correlation-Id', value: crypto.randomUUID() });",
+													"",
+													"// Marca de tiempo para esta iteración (antes de generar eventos)",
+													"pm.variables.set(\"since_ms\", Date.now());",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {},
+												"requests": {}
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "X-Forwarded-For",
+												"value": "8.8.8.8",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"usuario\": \"gerente1\",\r\n    \"contrasena\": \"Passw0rd!\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://ms-autorizador-8ab3fabee52e.herokuapp.com/login",
+											"protocol": "https",
+											"host": [
+												"ms-autorizador-8ab3fabee52e",
+												"herokuapp",
+												"com"
+											],
+											"path": [
+												"login"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "health",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "https://ms-alertas-d808ebcc0208.herokuapp.com/",
+											"protocol": "https",
+											"host": [
+												"ms-alertas-d808ebcc0208",
+												"herokuapp",
+												"com"
+											],
+											"path": [
+												""
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "login ip2",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"let json = pm.response.json();\r",
+													"pm.collectionVariables.set(\"token\", json.access_token);\r",
+													"pm.collectionVariables.set(\"rol\", json.rol);"
+												],
+												"type": "text/javascript",
+												"packages": {},
+												"requests": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"// Tomar IP2 desde la fila del CSV",
+													"const ip2 = pm.iterationData.get('ip2');",
+													"if (ip2) pm.request.headers.upsert({ key: 'X-Forwarded-For', value: String(ip2) });",
+													"",
+													"// Correlation ID",
+													"pm.request.headers.upsert({ key: 'X-Correlation-Id', value: crypto.randomUUID() });",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {},
+												"requests": {}
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "X-Forwarded-For",
+												"value": "8.8.8.8",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"usuario\": \"gerente1\",\r\n    \"contrasena\": \"Passw0rd!\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://ms-autorizador-8ab3fabee52e.herokuapp.com/login",
+											"protocol": "https",
+											"host": [
+												"ms-autorizador-8ab3fabee52e",
+												"herokuapp",
+												"com"
+											],
+											"path": [
+												"login"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "alertas exp",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript",
+												"packages": {},
+												"requests": {}
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"// --- Datos de la iteración (desde el CSV) ---",
+													"const expectedCSV = String(pm.iterationData.get(\"expected_rule\") || \"\").trim().toLowerCase();",
+													"const ip1 = String(pm.iterationData.get(\"ip1\") || \"\").trim();",
+													"const ip2 = String(pm.iterationData.get(\"ip2\") || \"\").trim();",
+													"const sinceMs = Number(pm.variables.get(\"since_ms\")) || null;",
+													"",
+													"// --- Normalizadores y mapeos ---",
+													"const norm = v => String(v || \"\").trim().toLowerCase();",
+													"",
+													"// Mapea los nombres del CSV a los nombres reales de la API",
+													"const RULE_MAP = {",
+													"  \"ip_diversa\": \"ip_diversa_usuario\",",
+													"  \"fuera_horario\": \"usuario_fuera_horario\",",
+													"  \"frecuencia\": \"concurrent_ips_usuario\",",
+													"  \"ninguna\": \"ninguna\"",
+													"};",
+													"const expectedRule = RULE_MAP[expectedCSV] || expectedCSV; // fallback por si acaso",
+													"",
+													"// --- Validaciones base ---",
+													"pm.test(\"Respuesta es array\", function () {",
+													"  pm.expect(pm.response.json()).to.be.an(\"array\");",
+													"});",
+													"",
+													"const all = pm.response.json();",
+													"",
+													"// Aplana todas las muestras de todos los objetos",
+													"const muestras = all.flatMap(x => (x && x.detalle && Array.isArray(x.detalle.muestra)) ? x.detalle.muestra : []);",
+													"",
+													"// Filtra por IPs de esta iteración y por tiempo (si since_ms existe)",
+													"const ipsIter = [ip1, ip2].filter(Boolean);",
+													"const relevantes = muestras.filter(m => {",
+													"  const hasIp = ipsIter.length === 0",
+													"    ? true",
+													"    : ipsIter.some(ip => String(m.ip || \"\").includes(ip)); // el campo ip trae lista separada por coma",
+													"",
+													"  const okTime = !sinceMs ? true : (m.createdAt ? Date.parse(m.createdAt) >= sinceMs : true);",
+													"",
+													"  return hasIp && okTime; // && okRecurso",
+													"});",
+													"",
+													"// Ahora asertamos según lo esperado en el CSV",
+													"if (expectedRule === \"ninguna\") {",
+													"  pm.test(\"Regla detectada correctamente (ninguna)\", function () {",
+													"    pm.expect(",
+													"      relevantes.length,",
+													"      `No debe haber alertas relevantes para IPs ${ipsIter.join(\", \")}`",
+													"    ).to.eql(0);",
+													"  });",
+													"} else {",
+													"  const hit = relevantes.find(m => norm(m.regla) === norm(expectedRule));",
+													"  pm.test(`Regla detectada correctamente (${expectedCSV} → ${expectedRule})`, function () {",
+													"    pm.expect(",
+													"      hit,",
+													"      `No se encontró la regla '${expectedRule}' en alertas relevantes (IPs ${ipsIter.join(\", \")})`",
+													"    ).to.be.an(\"object\");",
+													"  });",
+													"}",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {},
+												"requests": {}
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "https://ms-alertas-d808ebcc0208.herokuapp.com/alertas",
+											"protocol": "https",
+											"host": [
+												"ms-alertas-d808ebcc0208",
+												"herokuapp",
+												"com"
+											],
+											"path": [
+												"alertas"
+											]
+										}
+									},
+									"response": []
+								}
+							]
 						}
 					]
 				}
